@@ -1,4 +1,61 @@
 import random
+from Tkinter import *
+from tkMessageBox import askokcancel           
+
+class Quitter(Frame):                          
+    def __init__(self): 
+	self.serv = Serv = Serveur()        
+        Frame.__init__(self, None)
+        self.pack()
+   	fields = 'Word Suggested',
+	self.word = ''
+    	vars = self.makeform(self, fields)
+    	Button(self, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=LEFT)
+    	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
+        widget = Button(self, text='Quit', command=self.quit)
+        widget.pack(expand=YES, fill=BOTH, side=LEFT)
+
+    def quit(self):
+        ans = askokcancel('Verify exit', "Really quit?")
+        if ans: Frame.quit(self)
+
+
+    def fetch_and_run(self,variables):
+    	for variable in variables:
+       		self.word = variable.get()
+	if (self.serv.check_dict(self.word)==False):
+		print self.word + " doesn't exist, try another word!"
+    		for variable in variables:
+       			self.word = variable.get()
+	else :
+		print self. word +  " was found in the dictionnary, well done!"
+		print "Available letters : " 
+		print self.serv.letter_holderPL1
+		
+	
+    def makeform(self,root, fields):
+    	form = Frame(root)                              
+    	left = Frame(form)
+    	rite = Frame(form)
+    	form.pack(fill=X) 
+    	left.pack(side=LEFT)
+    	rite.pack(side=RIGHT, expand=YES, fill=X)
+    	variables = []
+    	for field in fields:
+        	lab = Label(left, width=15, text=field)
+        	ent = Entry(rite)
+       		lab.pack(side=TOP)
+        	ent.pack(side=TOP, fill=X)
+        	var = StringVar()
+        	ent.config(textvariable=var)
+        	var.set('enter here')
+        	variables.append(var)
+        return variables
+
+
+    def run(self):
+	while (len(self.serv.tiles) != 0):
+    		Tk().mainloop()
 
 class Serveur:
 	def __init__(self):
@@ -8,7 +65,7 @@ class Serveur:
 			print "Reading dictionnary..."
 			f=open("Mots_Scrabble.txt","r")
 			f.readline()
-			DICO=f.readlines()
+			self.DICO = DICO=f.readlines()
 			NB_MOTS=len(DICO)
 			num_ligne=1
 			chaine=""
@@ -59,6 +116,8 @@ class Serveur:
 			print "Initializing letter holders"
 			self.letter_holderPL1 = []
 			self.letter_holderPL2 = []
+			self.pick_tiles(self.letter_holderPL1)
+			self.pick_tiles(self.letter_holderPL2)
 			print "=> Done!"
 		#sinon le serveur se ferme
 		except IOError:
@@ -72,12 +131,10 @@ class Serveur:
 				letter_holder.append(self.tiles[rand_num])
 				self.tiles.pop(rand_num)
 
-	#Run game!
-	def run(self):
-		self.pick_tiles(self.letter_holderPL1)
-		self.pick_tiles(self.letter_holderPL2)
-		while (len(self.tiles) != 0):
-			print "yolo"
+	#Check if word is in the dictionnary
+	def check_dict(self, given_word):
+		return given_word + "\r\n" in self.DICO
 
-Serv = Serveur()
-Serv.run()
+Quitter().run()
+
+
