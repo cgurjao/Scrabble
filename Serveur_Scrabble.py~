@@ -23,14 +23,17 @@ class Quitter(Frame):
     def fetch_and_run(self,variables):
     	for variable in variables:
        		self.word = variable.get()
+	
 	if (self.serv.check_dict(self.word)==False):
 		print self.word + " doesn't exist, try another word!"
     		for variable in variables:
        			self.word = variable.get()
+	elif (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
+		print self.word + " can't be made with available letters!!!"
+    		for variable in variables:
+       			self.word = variable.get()
 	else :
 		print self. word +  " was found in the dictionnary, well done!"
-		print "Available letters : " 
-		print self.serv.letter_holderPL1
 		
 	
     def makeform(self,root, fields):
@@ -54,8 +57,7 @@ class Quitter(Frame):
 
 
     def run(self):
-	while (len(self.serv.tiles) != 0):
-    		Tk().mainloop()
+    	Tk().mainloop()
 
 class Serveur:
 	def __init__(self):
@@ -134,6 +136,17 @@ class Serveur:
 	#Check if word is in the dictionnary
 	def check_dict(self, given_word):
 		return given_word + "\r\n" in self.DICO
+
+	#Check if word can be made with the letters available in the holder!
+	def usable_letters(self, given_word, letter_holder):
+		print given_word
+		print letter_holder
+    		A = set(letter_holder).intersection(list(given_word))
+		if (len(A) == len(list(given_word))):
+			return True
+		else:
+			return False
+		
 
 Quitter().run()
 
