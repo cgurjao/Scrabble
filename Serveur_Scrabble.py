@@ -2,7 +2,7 @@ import random
 from Tkinter import *
 from tkMessageBox import askokcancel           
 
-class Quitter(Frame):                          
+class Scrabble_GUI(Frame):                          
     def __init__(self): 
 	self.serv = Serv = Serveur()        
         Frame.__init__(self, None)
@@ -10,6 +10,8 @@ class Quitter(Frame):
    	fields = 'Word Suggested',
 	self.word = ''
     	vars = self.makeform(self, fields)
+	print "Available letters : " 
+	print self.serv.letter_holderPL1
     	Button(self, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=LEFT)
     	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
         widget = Button(self, text='Quit', command=self.quit)
@@ -23,18 +25,21 @@ class Quitter(Frame):
     def fetch_and_run(self,variables):
     	for variable in variables:
        		self.word = variable.get()
-	
-	if (self.serv.check_dict(self.word)==False):
-		print self.word + " doesn't exist, try another word!"
-    		for variable in variables:
-       			self.word = variable.get()
-	elif (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
+	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
 		print self.word + " can't be made with available letters!!!"
     		for variable in variables:
        			self.word = variable.get()
+	elif (self.serv.check_dict(self.word)==False):
+		print self.word + " doesn't exist, try another word!"
+    		for variable in variables:
+       			self.word = variable.get()
 	else :
-		print self. word +  " was found in the dictionnary, well done!"		
-	
+		print self. word +  " was found in the dictionnary, well done!"
+		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
+		self.serv.pick_tiles(self.serv.letter_holderPL1)
+		print "Available letters : " 
+		print self.serv.letter_holderPL1	
+
     def makeform(self,root, fields):
     	form = Frame(root)                              
     	left = Frame(form)
@@ -116,9 +121,7 @@ class Serveur:
 			print "=> Done!"
 			print "Initializing letter holders"
 			self.letter_holderPL1 = []
-			self.letter_holderPL2 = []
 			self.pick_tiles(self.letter_holderPL1)
-			self.pick_tiles(self.letter_holderPL2)
 			print "=> Done!"
 		#sinon le serveur se ferme
 		except IOError:
@@ -138,15 +141,23 @@ class Serveur:
 
 	#Check if word can be made with the letters available in the holder!
 	def usable_letters(self, given_word, letter_holder):
-		print given_word
-		print letter_holder
     		A = set(letter_holder).intersection(list(given_word))
 		if (len(A) == len(list(given_word))):
 			return True
 		else:
 			return False
+
+	#Remove used letters
+	def remove_used_letters(self, given_word, letter_holder):
+    		A = set(letter_holder).intersection(list(given_word))
+		for i in range(len(list(A))):
+			for j in range(len(letter_holder)):
+				if (letter_holder[j] == list(A)[i]):
+					letter_holder.pop(j)
+					break
+		return letter_holder
 		
 
-Quitter().run()
+Scrabble_GUI().run()
 
 
