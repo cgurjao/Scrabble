@@ -19,26 +19,7 @@ class Scrabble_GUI(Frame):
 
     def quit(self):
         ans = askokcancel('Verify exit', "Really quit?")
-        if ans: Frame.quit(self)
-
-
-    def fetch_and_run(self,variables):
-    	for variable in variables:
-       		self.word = variable.get()
-	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
-		print self.word + " can't be made with available letters!!!"
-    		for variable in variables:
-       			self.word = variable.get()
-	elif (self.serv.check_dict(self.word)==False):
-		print self.word + " doesn't exist, try another word!"
-    		for variable in variables:
-       			self.word = variable.get()
-	else :
-		print self. word +  " was found in the dictionnary, well done!"
-		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
-		self.serv.pick_tiles(self.serv.letter_holderPL1)
-		print "Available letters : " 
-		print self.serv.letter_holderPL1	
+        if ans: Frame.quit(self)	
 
     def makeform(self,root, fields):
     	form = Frame(root)                              
@@ -59,6 +40,26 @@ class Scrabble_GUI(Frame):
         	variables.append(var)
         return variables
 
+    def fetch_and_run(self,variables):
+    	for variable in variables:
+       		self.word = variable.get()
+	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
+		print self.word + " can't be made with available letters!!!"
+    		for variable in variables:
+       			self.word = variable.get()
+	elif (self.serv.check_dict(self.word)==False):
+		print self.word + " doesn't exist, try another word!"
+    		for variable in variables:
+       			self.word = variable.get()
+	else :
+		print self. word +  " was found in the dictionnary, well done!"
+		self.serv.get_score(self.word, self.serv.scorePL1)
+		print "Your score : "
+		print self.serv.scorePL1
+		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
+		self.serv.pick_tiles(self.serv.letter_holderPL1)
+		print "Available letters : " 
+		print self.serv.letter_holderPL1
 
     def run(self):
     	Tk().mainloop()
@@ -117,10 +118,11 @@ class Serveur:
 				'W','W',
 				'X',
 				'Y','Y',
-				'z']
+				'Z']
 			print "=> Done!"
 			print "Initializing letter holders"
 			self.letter_holderPL1 = []
+			self.scorePL1 = 0
 			self.pick_tiles(self.letter_holderPL1)
 			print "=> Done!"
 		#sinon le serveur se ferme
@@ -141,22 +143,31 @@ class Serveur:
 
 	#Check if word can be made with the letters available in the holder!
 	def usable_letters(self, given_word, letter_holder):
-    		A = set(letter_holder).intersection(list(given_word))
-		if (len(A) == len(list(given_word))):
+		initial_len = len(letter_holder)
+		for i in range(len(list(given_word))):
+			for j in range(len(letter_holder)):
+				if (letter_holder[j] == list(given_word)[i]):
+					letter_holder.pop(j)
+					break
+		if ((initial_len - len(letter_holder)) == len(given_word)):
 			return True
 		else:
 			return False
-
 	#Remove used letters
 	def remove_used_letters(self, given_word, letter_holder):
     		A = set(letter_holder).intersection(list(given_word))
-		#self.letter_holderPL1 = [x for x in letter_holder if x not in list(A)]
 		for i in range(len(list(A))):
 			for j in range(len(letter_holder)):
 				if (letter_holder[j] == list(A)[i]):
 					letter_holder.pop(j)
 					break
 		return letter_holder
+
+	#New score
+	def get_score(self, given_word, score):
+    		for i in range(len(list(given_word))):
+			score = score + self.scores[list(given_word)[i]]
+		return score
 		
 
 Scrabble_GUI().run()
