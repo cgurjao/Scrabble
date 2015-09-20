@@ -13,110 +13,68 @@ def drawGameboard(canvas):
     Gameboard = canvas.data["Gameboard"]
     rows = len(Gameboard)
     cols = len(Gameboard[0])
-    #Draw normal cells
     for row in range(rows):
         for col in range(cols):
-            drawCell(canvas, Gameboard, row, col, "white")
-    #Draw "Triple word score" cells
-    drawCell(canvas, Gameboard, 14, 14, "orange")
-    drawCell(canvas, Gameboard, 0, 0, "orange")
-    drawCell(canvas, Gameboard, 0, 14, "orange")
-    drawCell(canvas, Gameboard, 14, 0, "orange")
-    drawCell(canvas, Gameboard, 0, 7, "orange")
-    drawCell(canvas, Gameboard, 7, 0, "orange")
-    drawCell(canvas, Gameboard, 7, 14, "orange")
-    drawCell(canvas, Gameboard, 14, 7, "orange")
-    #Draw center cell
-    drawCell(canvas, Gameboard, 7, 7, "red")
-    #Draw "Double word score" cell
-    drawCell(canvas, Gameboard, 1, 1, "pink")
-    drawCell(canvas, Gameboard, 2, 2, "pink")
-    drawCell(canvas, Gameboard, 3, 3, "pink")
-    drawCell(canvas, Gameboard, 4, 4, "pink")
-    drawCell(canvas, Gameboard, 14-1, 1, "pink")
-    drawCell(canvas, Gameboard, 14-2, 2, "pink")
-    drawCell(canvas, Gameboard, 14-3, 3, "pink")
-    drawCell(canvas, Gameboard, 14-4, 4, "pink")
-    drawCell(canvas, Gameboard, 1, 14-1, "pink")
-    drawCell(canvas, Gameboard, 2, 14-2, "pink")
-    drawCell(canvas, Gameboard, 3, 14-3, "pink")
-    drawCell(canvas, Gameboard, 4, 14-4, "pink")
-    drawCell(canvas, Gameboard, 14-1, 14-1, "pink")
-    drawCell(canvas, Gameboard, 14-2, 14-2, "pink")
-    drawCell(canvas, Gameboard, 14-3, 14-3, "pink")
-    drawCell(canvas, Gameboard, 14-4, 14-4, "pink")
-    #Draw "Triple letter score" cell
-    drawCell(canvas, Gameboard, 5, 1, "green")
-    drawCell(canvas, Gameboard, 14-5, 1, "green")
-    drawCell(canvas, Gameboard, 5, 14-1, "green")
-    drawCell(canvas, Gameboard, 14-5, 14-1, "green")
-    drawCell(canvas, Gameboard, 1, 5, "green")
-    drawCell(canvas, Gameboard, 1, 14-5, "green")
-    drawCell(canvas, Gameboard, 14-1, 5, "green")
-    drawCell(canvas, Gameboard, 14-1, 14-5, "green")
-    drawCell(canvas, Gameboard, 5, 5, "green")
-    drawCell(canvas, Gameboard, 14-5, 5, "green")
-    drawCell(canvas, Gameboard, 5, 14-5, "green")
-    drawCell(canvas, Gameboard, 14-5, 14-5, "green")
-    drawCell(canvas, Gameboard, 5, 5, "green")
-    drawCell(canvas, Gameboard, 5, 14-5, "green")
-    drawCell(canvas, Gameboard, 14-5, 5, "green")
-    drawCell(canvas, Gameboard, 14-5, 14-5, "green")
-    #Draw "Double letter score" cell
-    drawCell(canvas, Gameboard, 3, 0, "blue")
-    drawCell(canvas, Gameboard, 0, 3, "blue")
-    drawCell(canvas, Gameboard, 0, 14-3, "blue")
-    drawCell(canvas, Gameboard, 14-3, 0, "blue")
-    drawCell(canvas, Gameboard, 3, 14, "blue")
-    drawCell(canvas, Gameboard, 14, 3, "blue")
-    drawCell(canvas, Gameboard, 14, 14-3, "blue")
-    drawCell(canvas, Gameboard, 14-3, 14, "blue")
-    drawCell(canvas, Gameboard, 6, 6, "blue")
-    drawCell(canvas, Gameboard, 14-6, 6, "blue")
-    drawCell(canvas, Gameboard, 6, 14-6, "blue")
-    drawCell(canvas, Gameboard, 14-6, 14-6, "blue")
-    drawCell(canvas, Gameboard, 2, 6, "blue")
-    drawCell(canvas, Gameboard, 2, 14-6, "blue")
-    drawCell(canvas, Gameboard, 14-2, 6, "blue")
-    drawCell(canvas, Gameboard, 14-2, 14-6, "blue")
-    drawCell(canvas, Gameboard, 6, 2, "blue")
-    drawCell(canvas, Gameboard, 6, 14-2, "blue")
-    drawCell(canvas, Gameboard, 14-6, 2, "blue")
-    drawCell(canvas, Gameboard, 14-6, 14-2, "blue")
-    drawCell(canvas, Gameboard, 3, 7, "blue")
-    drawCell(canvas, Gameboard, 7, 3, "blue")
-    drawCell(canvas, Gameboard, 14-3, 7, "blue")
-    drawCell(canvas, Gameboard, 7, 14-3, "blue")
+            drawCell(canvas, Gameboard, row, col)
 
-
-
-def drawCell(canvas, Gameboard, row, col, color):
+def drawCell(canvas, Gameboard, row, col):
     margin = canvas.data["margin"]
     cellSize = canvas.data["cellSize"]
     left = margin + col * cellSize
     right = left + cellSize
     top = margin + row * cellSize
     bottom = top + cellSize
+    color = "white" 	
+    score_text = ""
+    if (Gameboard[row][col] == 1):
+	color = "red" 
+	score_text = ":)"
+    if (Gameboard[row][col] == 2):
+	color = "cyan" 	
+	score_text = "Double \n letter \n score"
+    if (Gameboard[row][col] == 3):
+	color = "green" 
+	score_text = "Triple \n letter \n score"	
+    if (Gameboard[row][col] == 4):
+	color = "pink" 	
+	score_text = "Double \n word \n score"	
+    if (Gameboard[row][col] == 6):
+	color = "orange"
+	score_text = "Triple \n word \n score"	
+    if (Gameboard[row][col] == 10):
+	color = "grey"
+	score_text = "LETTER"
+
     canvas.create_rectangle(left, top, right, bottom, fill=color)
     #if (canvas.data["inDebugMode"] == True):
     canvas.create_text(left+cellSize/2,top+cellSize/2,
-                           text=str(Gameboard[row][col]),font=("Helvatica", 14, "bold"))
+                           text=score_text,font=("Helvatica", 8, "bold"))
 
 def init(canvas):
     loadGameboard(canvas)
     canvas.data["inDebugMode"] = False
     canvas.data["isGameOver"] = False
-    canvas.data["snakeDrow"] = 0
-    canvas.data["snakeDcol"] = -1 # start moving left
-    canvas.data["ignoreNextTimerEvent"] = False
     redrawAll(canvas)
 
 def loadGameboard(canvas):
     rows = canvas.data["rows"]
     cols = canvas.data["cols"]
-    Gameboard = [ ]
-    for row in range(rows): Gameboard += [[0] * cols]
-    Gameboard[rows/2][cols/2] = 1
+    Gameboard =  [ [ 6, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0, 2, 0, 0, 6 ],
+                   [ 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 4, 0 ],
+                   [ 0, 0, 4, 0, 0, 0, 2, 0, 2, 0, 0, 0, 4, 0, 0 ],
+ 		   [ 2, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 2 ],
+		   [ 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0 ],
+		   [ 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0 ],
+		   [ 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0 ],
+		   [ 6, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6 ],
+		   [ 0, 0, 2, 0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 0, 0 ],
+                   [ 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0 ],
+ 		   [ 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0 ],
+		   [ 2, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 2 ],
+		   [ 0, 0, 4, 0, 0, 0, 2, 0, 2, 0, 0, 0, 4, 0, 0 ],
+		   [ 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 4, 0 ],
+		   [ 6, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0, 2, 0, 0, 6 ],
+                ]
     canvas.data["Gameboard"] = Gameboard
 
 def run():
