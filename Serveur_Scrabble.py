@@ -1,6 +1,7 @@
 import random
 from Tkinter import *
-from tkMessageBox import askokcancel           
+from tkMessageBox import askokcancel      
+from Gameboard import *
 
 class Scrabble_GUI(Frame):                          
     def __init__(self): 
@@ -16,6 +17,24 @@ class Scrabble_GUI(Frame):
     	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
         widget = Button(self, text='Quit', command=self.quit)
         widget.pack(expand=YES, fill=BOTH, side=LEFT)
+	self.root = Tk()
+    	margin = 5
+    	cellSize = 60
+    	canvasWidth = 2*margin + 15*cellSize
+    	canvasHeight = 2*margin + 15*cellSize
+    	self.canvas = Canvas(self.root, width=canvasWidth, height=canvasHeight)
+    	self.canvas.pack()
+    	self.root.resizable(width=0, height=0)
+   	 # Store canvas in root and in canvas itself for callbacks
+    	self.root.canvas = self.canvas.canvas = self.canvas
+    	# Set up canvas data and call init
+    	self.canvas.data = { }
+    	self.canvas.data["margin"] = margin
+    	self.canvas.data["cellSize"] = cellSize
+   	self.canvas.data["canvasWidth"] = canvasWidth
+    	self.canvas.data["canvasHeight"] = canvasHeight
+    	self.canvas.data["rows"] = 15
+    	self.canvas.data["cols"] = 15
 
     def quit(self):
         ans = askokcancel('Verify exit', "Really quit?")
@@ -52,17 +71,26 @@ class Scrabble_GUI(Frame):
     		for variable in variables:
        			self.word = variable.get()
 	else :
-		print self. word +  " was found in the dictionnary, well done!"
-		self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
-		print "Your score : "
-		print self.serv.scorePL1
-		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
-		self.serv.pick_tiles(self.serv.letter_holderPL1)
-		print "Available letters : " 
-		print self.serv.letter_holderPL1
+		if (self.GM.check_if_possible(self.word, 2, 2, 0) == False):
+			print "Action not possible"
+		else:
+			print self. word +  " was found in the dictionnary, well done!"
+			self.GM.put_tiles(self.word, 2, 2, 0) #Get first position, get info about horizontal/vertical
+			self.GM.drawGameboard(self.canvas)
+			self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
+			print "Your score : "
+			print self.serv.scorePL1
+			self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
+			self.serv.pick_tiles(self.serv.letter_holderPL1)
+			print "Available letters : " 
+			print self.serv.letter_holderPL1
 
     def run(self):
-    	Tk().mainloop()
+   	# create the root and the canvas
+	self.GM = Gameboard()
+    	self.GM.init(self.canvas)
+	self.canvas.bind("<Button-1>", self.GM.click)
+	self.root.mainloop()
 
 class Serveur:
 	def __init__(self):
@@ -167,7 +195,7 @@ class Serveur:
 	def get_score(self, given_word, score):
     		for i in range(len(list(given_word))):
 			score = score + self.scores[list(given_word)[i]]
-		return score
+		return score		
 		
 
 Scrabble_GUI().run()
