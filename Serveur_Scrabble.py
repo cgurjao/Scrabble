@@ -18,9 +18,9 @@ class Scrabble_GUI(Frame):
         widget = Button(self, text='Quit', command=self.quit)
         widget.pack(expand=YES, fill=BOTH, side=LEFT)
 	self.root = Tk()
-    	margin = 5
+    	margin = 0
     	cellSize = 60
-    	canvasWidth = 1050#2*margin + 15*cellSize
+    	canvasWidth = 1200#2*margin + 15*cellSize
     	canvasHeight = 910 #2*margin + 15*cellSize
     	self.canvas = Canvas(self.root, width=canvasWidth, height=canvasHeight)
     	self.canvas.pack()
@@ -60,11 +60,7 @@ class Scrabble_GUI(Frame):
         return variables
 
     def fetch_and_run(self,variables):
-	print "Select first tiles !"
-	self.GM.clickpos = []
-	while (self.GM.clickpos == []):
-		self.canvas.bind("<Button-1>", self.GM.click)
-	print self.GM.clickpos
+	print "Form your words !"
     	for variable in variables:
        		self.word = variable.get()
 	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
@@ -99,7 +95,6 @@ class Scrabble_GUI(Frame):
     	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup)
     	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter)
     	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave)
-	self.canvas.create_rectangle(950,0,1010,60, fill='red', tags = 'DnD')
 	self.root.mainloop()
 
 class Serveur:

@@ -55,7 +55,7 @@ class Gameboard():
 
 	def init(self,canvas,root):
 		self.root = root
-		self.loc =self.dragged =0
+    		self.loc =self.dragged =0
 		self.defaultcolor =canvas.itemcget (canvas.create_text (0, 0, text ="", tags ="DnD"), "fill")
     		self.loadGameboard(canvas)
 		self.canvas = canvas
@@ -78,6 +78,20 @@ class Gameboard():
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""]]
+		canvas.create_rectangle(950,0,1010,60, fill='grey', tags=('DnD', '0'))
+		canvas.create_rectangle(950,60,1010,120, fill='grey', tags=('DnD', '1'))
+		canvas.create_rectangle(950,120,1010,180, fill='grey', tags=('DnD', '2'))
+		canvas.create_rectangle(950,180,1010,240, fill='grey', tags=('DnD', '3'))
+		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4'))
+		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5'))
+		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6'))
+		canvas.create_text (980, 30, text = '0', tags=('DnD', '0'))
+		canvas.create_text (980, 90, text = '1', tags=('DnD', '1'))
+		canvas.create_text (980, 150, text = '2', tags=('DnD', '2'))
+		canvas.create_text (980, 210, text = '3', tags=('DnD', '3'))
+		canvas.create_text (980, 270, text = '4', tags=('DnD', '4'))
+		canvas.create_text (980, 330, text = '5', tags=('DnD', '5'))
+		canvas.create_text (980, 390, text = '6', tags=('DnD', '6'))
 
 	def loadGameboard(self,canvas):
    		rows = canvas.data["rows"]
@@ -131,13 +145,10 @@ class Gameboard():
        			self.canvas.itemconfig(CURRENT)
         		self.canvas.update_idletasks()
         		self.canvas.after(20)
-        	print event.x/60
-		print event.y/60
 		self.clickpos = [event.x/60, event.y/60]
 
-	def down (self,  event):
-    		print event.widget.coords(tk.CURRENT)
-    		self.loc =1
+	def down (self,  event):	
+		self.loc =1
     		self.dragged =0
     		event.widget.bind ("<Motion>", self.motion)
 
@@ -146,17 +157,13 @@ class Gameboard():
     		cnv = event.widget
     		cnv.itemconfigure (tk.CURRENT, fill ="blue")
     		xy = cnv.canvasx(event.x), cnv.canvasy(event.y)
-    		points = event.widget.coords (tk.CURRENT)
+    		points = event.widget.coords(tk.CURRENT)
     		anchors = copy.copy(points[:2])
-    		print points
-    
     		for idx in range(len(points)):
        		 	mouse = xy[idx % 2]
         		zone = anchors[idx % 2]
         		points[idx] = points[idx] - zone + mouse
-    
-    		print points
-    		apply(event.widget.coords, [tk.CURRENT] + points)
+    			apply(event.widget.coords, [tk.CURRENT] + points)
   
   	def leave (self, event):
     		self.loc =0
@@ -171,24 +178,26 @@ class Gameboard():
     		self.root.config (cursor ="")
     		self.target =event.widget.find_withtag (tk.CURRENT)
     		event.widget.itemconfigure (tk.CURRENT, fill = self.defaultcolor)
+		points = [60*int(x / 60) for x in event.widget.coords(tk.CURRENT)]
     		if self.loc:
-      			self.up (event)
+			event.widget.coords(tk.CURRENT, points[0], points[1], points[2], points [3])
+      			self.up(event)
     		else:
     			self.dragged = event.time
 
   	def up (self, event):
+    		event.widget.itemconfigure (tk.CURRENT, fill = "grey")
     		event.widget.unbind ("<Motion>")
     		if (self.target ==event.widget.find_withtag (tk.CURRENT)):
-      			print #"Select %s" %event.widget.itemcget (tk.CURRENT, "text")
+      			pass #"Select %s" %event.widget.itemcget (tk.CURRENT, "text")
     		else:
-      			event.widget.itemconfigure (tk.CURRENT, fill ="blue")
-      			self.master.update()
-      			time.sleep (.1)
-      			print "%s Drag-N-Dropped onto %s" \
-        			%(event.widget.itemcget (self.target, "text"),
-   		event.widget.itemcget (tk.CURRENT, "text"))
-      		event.widget.itemconfigure (tk.CURRENT, fill =self.defaultcolor)
+			pass
+      			#event.widget.itemconfigure (tk.CURRENT, fill ="blue")
+      			#self.root.update()
+     			#time.sleep (.1)
+      			#print "%s Drag-N-Dropped onto %s" \
+        		#	%(event.widget.itemcget (self.target, "text"),
+   			#event.widget.itemcget (tk.CURRENT, "text"))
+      			#event.widget.itemconfigure (tk.CURRENT, fill =self.defaultcolor)
 
-		
-		
 
