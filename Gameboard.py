@@ -85,13 +85,13 @@ class Gameboard():
 		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4'))
 		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5'))
 		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6'))
-		canvas.create_text (980, 30, text = '0', tags=('DnD', '0'))
-		canvas.create_text (980, 90, text = '1', tags=('DnD', '1'))
-		canvas.create_text (980, 150, text = '2', tags=('DnD', '2'))
-		canvas.create_text (980, 210, text = '3', tags=('DnD', '3'))
-		canvas.create_text (980, 270, text = '4', tags=('DnD', '4'))
-		canvas.create_text (980, 330, text = '5', tags=('DnD', '5'))
-		canvas.create_text (980, 390, text = '6', tags=('DnD', '6'))
+		canvas.create_text (980, 30, text = 'A', tags=('0', 'letter'))
+		canvas.create_text (980, 90, text = 'B', tags=('1', 'letter'))
+		canvas.create_text (980, 150, text = 'C', tags=('2', 'letter'))
+		canvas.create_text (980, 210, text = 'D', tags=( '3', 'letter'))
+		canvas.create_text (980, 270, text = 'E', tags=( '4', 'letter'))
+		canvas.create_text (980, 330, text = 'F', tags=( '5', 'letter'))
+		canvas.create_text (980, 390, text = 'G', tags=( '6', 'letter'))
 
 	def loadGameboard(self,canvas):
    		rows = canvas.data["rows"]
@@ -153,6 +153,9 @@ class Gameboard():
     		event.widget.bind ("<Motion>", self.motion)
 
   	def motion (self, event):
+		associated_canvas =  self.canvas.find_withtag('letter')[int(self.canvas.gettags(CURRENT)[1])]
+		print event.widget.coords(associated_canvas)
+		print event.widget.coords(tk.CURRENT)
     		self.root.config (cursor ="exchange")
     		cnv = event.widget
     		cnv.itemconfigure (tk.CURRENT, fill ="blue")
@@ -160,11 +163,12 @@ class Gameboard():
     		points = event.widget.coords(tk.CURRENT)
     		anchors = copy.copy(points[:2])
     		for idx in range(len(points)):
-       		 	mouse = xy[idx % 2]
-        		zone = anchors[idx % 2]
-        		points[idx] = points[idx] - zone + mouse
-    			apply(event.widget.coords, [tk.CURRENT] + points)
-  
+       		 		mouse = xy[idx % 2]
+        			zone = anchors[idx % 2]
+        			points[idx] = points[idx] - zone + mouse
+    				apply(event.widget.coords, [tk.CURRENT] + points)
+				apply(event.widget.coords, [associated_canvas] + [60*int(event.x/60) + 30,  60*int(event.y/60) + 30])
+
   	def leave (self, event):
     		self.loc =0
 
