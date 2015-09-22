@@ -20,8 +20,8 @@ class Scrabble_GUI(Frame):
 	self.root = Tk()
     	margin = 5
     	cellSize = 60
-    	canvasWidth = 2*margin + 15*cellSize
-    	canvasHeight = 2*margin + 15*cellSize
+    	canvasWidth = 1050#2*margin + 15*cellSize
+    	canvasHeight = 910 #2*margin + 15*cellSize
     	self.canvas = Canvas(self.root, width=canvasWidth, height=canvasHeight)
     	self.canvas.pack()
     	self.root.resizable(width=0, height=0)
@@ -60,6 +60,11 @@ class Scrabble_GUI(Frame):
         return variables
 
     def fetch_and_run(self,variables):
+	print "Select first tiles !"
+	self.GM.clickpos = []
+	while (self.GM.clickpos == []):
+		self.canvas.bind("<Button-1>", self.GM.click)
+	print self.GM.clickpos
     	for variable in variables:
        		self.word = variable.get()
 	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
@@ -71,11 +76,11 @@ class Scrabble_GUI(Frame):
     		for variable in variables:
        			self.word = variable.get()
 	else :
-		if (self.GM.check_if_possible(self.word, 2, 2, 0) == False):
-			print "Action not possible"
-		else:
+		#if (self.GM.check_if_possible(self.word, 2, 2, 0) == False):
+		#	print "Action not possible"
+		#else:
 			print self. word +  " was found in the dictionnary, well done!"
-			self.GM.put_tiles(self.word, 2, 2, 0) #Get first position, get info about horizontal/vertical
+			self.GM.put_tiles(self.word, initial_pos[0], initial_pos[1], 0) #Get first position, get info about horizontal/vertical
 			self.GM.drawGameboard(self.canvas)
 			self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
 			print "Your score : "
@@ -88,8 +93,14 @@ class Scrabble_GUI(Frame):
     def run(self):
    	# create the root and the canvas
 	self.GM = Gameboard()
-    	self.GM.init(self.canvas)
-	self.canvas.bind("<Button-1>", self.GM.click(self.canvas))
+	
+    	self.GM.init(self.canvas, self.root)
+	self.canvas.bind("<Button-1>", self.GM.click)
+    	self.canvas.tag_bind ("DnD", "<ButtonPress-1>", self.GM.down)
+    	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup)
+    	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter)
+    	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave)
+	self.canvas.create_rectangle(950,0,1010,60, fill='red', tags = 'DnD')
 	self.root.mainloop()
 
 class Serveur:

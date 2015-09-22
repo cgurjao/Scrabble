@@ -1,6 +1,7 @@
 import random
 from Tkinter import *
-
+import Tkinter
+tk = Tkinter
 
 class Gameboard():   
 	def redrawAll(self,canvas):
@@ -51,11 +52,15 @@ class Gameboard():
     		canvas.create_text(left+cellSize/2,top+cellSize/2,
                            text=score_text,font=("Helvatica", 8, "bold"))
 
-	def init(self,canvas):
+	def init(self,canvas,root):
+		self.root = root
+		self.loc =self.dragged =0
+		self.defaultcolor =canvas.itemcget (canvas.create_text (0, 0, text ="", tags ="DnD"), "fill")
     		self.loadGameboard(canvas)
 		self.canvas = canvas
     		canvas.data["inDebugMode"] = False
     		canvas.data["isGameOver"] = False
+		self.clickpos = []
     		self.redrawAll(canvas)
 		self.Gameboard_letter =  [["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""],
@@ -122,8 +127,67 @@ class Gameboard():
 
 	def click(self, event):
     		if self.canvas.find_withtag(CURRENT):
-       			self.canvas.itemconfig(CURRENT, fill="blue")
+       			self.canvas.itemconfig(CURRENT)
         		self.canvas.update_idletasks()
-        		self.canvas.after(200)
-        		print event
+        		self.canvas.after(20)
+        	print event.x/60
+		print event.y/60
+		self.clickpos = [event.x/60, event.y/60]
+
+	def down (self,  event):
+    		print event.widget.coords(tk.CURRENT)
+    		self.loc =1
+    		self.dragged =0
+    		event.widget.bind ("<Motion>", self.motion)
+
+  	def motion (self, event):
+    		self.root.config (cursor ="exchange")
+    		cnv = event.widget
+    		cnv.itemconfigure (tk.CURRENT, fill ="blue")
+    		xy = cnv.canvasx(event.x), cnv.canvasy(event.y)
+    		points = event.widget.coords (tk.CURRENT)
+    		anchors = copy.copy(points[:2])
+    		print points
+    
+    		for idx in range(len(points)):
+       		 	mouse = xy[idx % 2]
+        		zone = anchors[idx % 2]
+        		points[idx] = points[idx] - zone + mouse
+    
+    		print points
+    		apply(event.widget.coords, [tk.CURRENT] + points)
+  
+  	def leave (self, event):
+    		self.loc =0
+
+  	def enter (self, event):
+    		self.loc =1
+    		if self.dragged == event.time:
+     		 self.up (event)
+
+  	def chkup (self, event):
+    		event.widget.unbind ("<Motion>")
+    		self.root.config (cursor ="")
+    		self.target =event.widget.find_withtag (tk.CURRENT)
+    		event.widget.itemconfigure (tk.CURRENT, fill = self.defaultcolor)
+    		if self.loc:
+      			self.up (event)
+    		else:
+    			self.dragged = event.time
+
+  	def up (self, event):
+    		event.widget.unbind ("<Motion>")
+    		if (self.target ==event.widget.find_withtag (tk.CURRENT)):
+      			print #"Select %s" %event.widget.itemcget (tk.CURRENT, "text")
+    		else:
+      			event.widget.itemconfigure (tk.CURRENT, fill ="blue")
+      			self.master.update()
+      			time.sleep (.1)
+      			print "%s Drag-N-Dropped onto %s" \
+        			%(event.widget.itemcget (self.target, "text"),
+   		event.widget.itemcget (tk.CURRENT, "text"))
+      		event.widget.itemconfigure (tk.CURRENT, fill =self.defaultcolor)
+
+		
+		
 
