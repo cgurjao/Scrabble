@@ -85,13 +85,13 @@ class Gameboard():
 		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4'))
 		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5'))
 		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6'))
-		canvas.create_text (980, 30, text = 'A', tags=('DnD', '0', 'letter'))
-		canvas.create_text (980, 90, text = 'B', tags=('DnD', '1', 'letter'))
-		canvas.create_text (980, 150, text = 'C', tags=('DnD', '2', 'letter'))
-		canvas.create_text (980, 210, text = 'D', tags=('DnD', '3', 'letter'))
-		canvas.create_text (980, 270, text = 'E', tags=('DnD', '4', 'letter'))
-		canvas.create_text (980, 330, text = 'F', tags=('DnD', '5', 'letter'))
-		canvas.create_text (980, 390, text = 'G', tags=('DnD', '6', 'letter'))
+		canvas.create_text (980, 30, text = '', tags=('0', 'letter'))
+		canvas.create_text (980, 90, text = '', tags=('1', 'letter'))
+		canvas.create_text (980, 150, text = '', tags=('2', 'letter'))
+		canvas.create_text (980, 210, text = '', tags=( '3', 'letter'))
+		canvas.create_text (980, 270, text = '', tags=( '4', 'letter'))
+		canvas.create_text (980, 330, text = '', tags=( '5', 'letter'))
+		canvas.create_text (980, 390, text = '', tags=( '6', 'letter'))
 
 	def loadGameboard(self,canvas):
    		rows = canvas.data["rows"]
@@ -113,17 +113,6 @@ class Gameboard():
 		   [ 6, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0, 2, 0, 0, 6 ],
                 ]
     		canvas.data["Gameboard"] = Gameboard
-
-
-	#put tiles on the game board
-	def put_tiles(self, word, x ,y , horiz_or_verti): #1 for horizontal, 0 for vertical
-		for i in range(len(list(word))):
-			if (horiz_or_verti == 0): 	
-				self.Gameboard_letter[x+i][y] = list(word)[i]
-				self.Gameboard[x+i][y] = 10
-			else:
-				self.Gameboard_letter[x][y+i] = list(word)[i]
-				self.Gameboard[x][y+i] = 10
 
 	#check if action is possible
 	def check_if_possible(self, word, x ,y , horiz_or_verti):
@@ -154,8 +143,6 @@ class Gameboard():
 
   	def motion (self, event):
 		associated_canvas =  self.canvas.find_withtag('letter')[int(self.canvas.gettags(CURRENT)[1])]
-		print event.widget.coords(associated_canvas)
-		print event.widget.coords(tk.CURRENT)
     		self.root.config (cursor ="exchange")
     		cnv = event.widget
     		cnv.itemconfigure (tk.CURRENT, fill ="blue")
@@ -203,5 +190,25 @@ class Gameboard():
         		#	%(event.widget.itemcget (self.target, "text"),
    			#event.widget.itemcget (tk.CURRENT, "text"))
       			#event.widget.itemconfigure (tk.CURRENT, fill =self.defaultcolor)
+
+	def put_new_tiles(self, letter_holder):
+		for i in range(7):
+			associated_canvas =  self.canvas.find_withtag('letter')[i]
+			self.canvas.itemconfig(associated_canvas, text = letter_holder[i])
+		
+
+
+	#put tiles on the game board
+	def put_tiles(self, word, pos): 
+		x = 0
+		y = 0
+		horiz_or_verti = 0
+		for i in range(len(list(word))):
+			if (horiz_or_verti == 0): 	
+				self.Gameboard_letter[x+i][y] = list(word)[i]
+				self.Gameboard[x+i][y] = 10
+			else:
+				self.Gameboard_letter[x][y+i] = list(word)[i]
+				self.Gameboard[x][y+i] = 10
 
 

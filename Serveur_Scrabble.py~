@@ -76,13 +76,14 @@ class Scrabble_GUI(Frame):
 		#	print "Action not possible"
 		#else:
 			print self. word +  " was found in the dictionnary, well done!"
-			self.GM.put_tiles(self.word, initial_pos[0], initial_pos[1], 0) #Get first position, get info about horizontal/vertical
 			self.GM.drawGameboard(self.canvas)
 			self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
 			print "Your score : "
 			print self.serv.scorePL1
 			self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
 			self.serv.pick_tiles(self.serv.letter_holderPL1)
+			print self.GM.put_new_tiles(self.serv.letter_holderPL1)
+			self.GM.put_tiles(self.word) #Get first position, get info about horizontal/vertical
 			print "Available letters : " 
 			print self.serv.letter_holderPL1
 
@@ -95,7 +96,7 @@ class Scrabble_GUI(Frame):
     	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup)
     	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter)
     	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave)
-
+	self.GM.put_new_tiles(self.serv.letter_holderPL1)
 	self.root.mainloop()
 
 class Serveur:
