@@ -5,23 +5,22 @@ from Gameboard import *
 
 class Scrabble_GUI(Frame):                          
     def __init__(self): 
-	self.serv = Serv = Serveur()        
+	self.serv = Serv = Serveur() 
         Frame.__init__(self, None)
         self.pack()
+	self.root = Tk()
    	fields = 'Word Suggested',
 	self.word = ''
-    	vars = self.makeform(self, fields)
-	print "Available letters : " 
+	print "Available letters : "  #To display first available letters in the holder
 	print self.serv.letter_holderPL1
-    	Button(self, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=LEFT)
+    	Button(self.root, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=RIGHT) #"Fetch suggested word" button
     	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
-        widget = Button(self, text='Quit', command=self.quit)
-        widget.pack(expand=YES, fill=BOTH, side=LEFT)
-	self.root = Tk()
-    	margin = 0
-    	cellSize = 60
-    	canvasWidth = 1200#2*margin + 15*cellSize
-    	canvasHeight = 910 #2*margin + 15*cellSize
+        widget2 = Button(self.root, text='Quit', command=self.quit) #"Quit" button
+	widget2.pack(side=RIGHT)
+    	margin = 0 #Define the space between each cell of the gameboard
+    	cellSize = 60 #Size (in pixels) of the cells 
+    	canvasWidth = 1100 # Width of the window
+    	canvasHeight = 910 # Height of the window
     	self.canvas = Canvas(self.root, width=canvasWidth, height=canvasHeight)
     	self.canvas.pack()
     	self.root.resizable(width=0, height=0)
@@ -37,69 +36,51 @@ class Scrabble_GUI(Frame):
     	self.canvas.data["cols"] = 15
 
     def quit(self):
-        ans = askokcancel('Verify exit', "Really quit?")
+        ans = askokcancel('Verify exit', "Really quit?") #To make sure the player want to exit the game
         if ans: Frame.quit(self)	
 
-    def makeform(self,root, fields):
-    	form = Frame(root)                              
-    	left = Frame(form)
-    	rite = Frame(form)
-    	form.pack(fill=X) 
-    	left.pack(side=LEFT)
-    	rite.pack(side=RIGHT, expand=YES, fill=X)
-    	variables = []
-    	for field in fields:
-        	lab = Label(left, width=15, text=field)
-        	ent = Entry(rite)
-       		lab.pack(side=TOP)
-        	ent.pack(side=TOP, fill=X)
-        	var = StringVar()
-        	ent.config(textvariable=var)
-        	var.set('enter here')
-        	variables.append(var)
-        return variables
-
-    def fetch_and_run(self,variables):
+    def fetch_and_run(self,variables): #Each time the user clicks on "Fetch", the program will... 
 	print "Form your words !"
-	horiz_or_verti = self.GM.check_aligned()
-	if horiz_or_verti == 2:
+	horiz_or_vert = self.GM.check_aligned()  #...Check if the tiles are aligned and determine if the word is put horizontally or vertically (resp, horiz_or_vert will be equal to 0 and 1)
+	if horiz_or_vert == 2:
 		print "Not aligned!!!"
 		return 0
-	self.word = self.GM.getword(horiz_or_verti)
-	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
-		print self.word + " can't be made with available letters!!!"
-    		return 0
-	elif (self.serv.check_dict(self.word)==False):
+	self.word = self.GM.getword(horiz_or_vert)	#...get the suggested word from the gameboard 
+	if (self.serv.check_dict(self.word)==False):   #...Check if the word exists in the dictionnary
 		print self.word + " doesn't exist, try another word!"
     		return 0
-	else :
-		print self. word +  " was found in the dictionnary, well done!"
-		self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
+	else :	#If all the previous conditions are met, the algorithm will...
+		print self. word +  " was found in the dictionnary, well done!" 
+		self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)  #...Calculate and update the player's score
 		print "Your score : "
 		print self.serv.scorePL1
-		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
-		self.serv.pick_tiles(self.serv.letter_holderPL1)
-		print self.GM.put_new_tiles(self.serv.letter_holderPL1)
-		self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1)
-		x = 0
-		y = 0
-		self.GM.put_tiles(self.word, x, y, horiz_or_verti) 
-		print "Available letters : " 
-		print self.serv.letter_holderPL1
+		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)	#...Remove used letters from the letter holder 
+		initialpos = self.GM.get_initialpos(horiz_or_vert)
+		self.GM.put_tiles(self.word, initialpos[1], initialpos[0], horiz_or_vert) #...Put the suggested word on the gameboard "for real" (i.e. the player won't be able to move them anymore)
+		self.serv.pick_tiles(self.serv.letter_holderPL1) 	#...Fill the letter holder with other tiles
+		self.GM.drawGameboard(self.canvas) the screen
+	self.wait_for_nextclick()
+
+    def wait_for_nextclick(self):
+	self.GM.associate_letter_tiles(self.serv.letter_holderPL1)
+	self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1) #...Print the new updated letter holder on
+	print "Available letters : "  #To display first available letters in the holder
+	print self.serv.letter_holderPL1
+    	Button(self.root, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=RIGHT) #"Fetch suggested word" button
+    	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
+	
 		
-		self.GM.drawGameboard(self.canvas)
 
     def run(self):
    	# create the root and the canvas
 	self.GM = Gameboard()
     	self.GM.init(self.canvas, self.root)
-	self.canvas.bind("<Button-1>", self.GM.click)
-    	self.canvas.tag_bind ("DnD", "<ButtonPress-1>", self.GM.down)
-    	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup)
-    	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter)
-    	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave)
-	self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1)
-	self.GM.put_new_tiles(self.serv.letter_holderPL1)
+	self.canvas.bind("<Button-1>", self.GM.click) #Bind button to function call
+    	self.canvas.tag_bind ("DnD", "<ButtonPress-1>", self.GM.down) #Bind button to function call
+    	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup) #Bind button to function call
+    	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter) #Bind button to function call
+    	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave) #Bind button to function call
+	self.GM.associate_letter_tiles(self.serv.letter_holderPL1) #Diplay first letter holder
 	self.root.mainloop()
 
 class Serveur:

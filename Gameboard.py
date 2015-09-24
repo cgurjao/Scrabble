@@ -56,7 +56,7 @@ class Gameboard():
 	def init(self,canvas,root):
 		self.root = root
     		self.loc =self.dragged =0
-		self.defaultcolor =canvas.itemcget (canvas.create_text (0, 0, text ="", tags ="DnD"), "fill")
+		self.defaultcolor =canvas.itemcget(canvas.create_text (0, 0, text ="", tags ="DnD"), "fill")
     		self.loadGameboard(canvas)
 		self.canvas = canvas
     		canvas.data["inDebugMode"] = False
@@ -78,22 +78,30 @@ class Gameboard():
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""]]
+		canvas.create_rectangle(950,0,1010,60, fill='grey', tags=('DnD', '0', 'tile'))
+		canvas.create_rectangle(950,60,1010,120, fill='grey', tags=('DnD', '1', 'tile'))
+		canvas.create_rectangle(950,120,1010,180, fill='grey', tags=('DnD', '2', 'tile'))
+		canvas.create_rectangle(950,180,1010,240, fill='grey', tags=('DnD', '3', 'tile'))
+		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4', 'tile'))
+		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5', 'tile'))
+		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6', 'tile'))
+		canvas.create_text (980, 30, text = "", tags=('0', 'letter'))
+		canvas.create_text (980, 90, text = "", tags=('1', 'letter'))
+		canvas.create_text (980, 150, text = "", tags=('2', 'letter'))
+		canvas.create_text (980, 210, text = "", tags=( '3', 'letter'))
+		canvas.create_text (980, 270, text = "", tags=( '4', 'letter'))
+		canvas.create_text (980, 330, text = "", tags=( '5', 'letter'))
+		canvas.create_text (980, 390, text = "", tags=( '6', 'letter'))
 
 	def draw_letterHolder(self,canvas,root, letter_holder):
-		canvas.create_rectangle(950,0,1010,60, fill='grey', tags=('DnD', '0'))
-		canvas.create_rectangle(950,60,1010,120, fill='grey', tags=('DnD', '1'))
-		canvas.create_rectangle(950,120,1010,180, fill='grey', tags=('DnD', '2'))
-		canvas.create_rectangle(950,180,1010,240, fill='grey', tags=('DnD', '3'))
-		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4'))
-		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5'))
-		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6'))
-		canvas.create_text (980, 30, text = letter_holder[0], tags=('0', 'letter'))
-		canvas.create_text (980, 90, text = letter_holder[1], tags=('1', 'letter'))
-		canvas.create_text (980, 150, text = letter_holder[2], tags=('2', 'letter'))
-		canvas.create_text (980, 210, text = letter_holder[3], tags=( '3', 'letter'))
-		canvas.create_text (980, 270, text = letter_holder[4], tags=( '4', 'letter'))
-		canvas.create_text (980, 330, text = letter_holder[5], tags=( '5', 'letter'))
-		canvas.create_text (980, 390, text = letter_holder[6], tags=( '6', 'letter'))
+		associated_canvas =  self.canvas.find_withtag('tile')
+		for i in range(7):
+			self.canvas.coords(associated_canvas[i], Tkinter._flatten([int(950), int(i*60), int(1010), int((i+1)*60)]))
+			self.canvas.tag_raise(associated_canvas[i])
+		associated_canvas =  self.canvas.find_withtag('letter')
+		for i in range(7):
+			self.canvas.coords(associated_canvas[i], Tkinter._flatten([int(980), int((i)*60+30)]))
+			self.canvas.tag_raise(associated_canvas[i])
 
 	def loadGameboard(self,canvas):
    		rows = canvas.data["rows"]
@@ -193,17 +201,15 @@ class Gameboard():
    			#event.widget.itemcget (tk.CURRENT, "text"))
       			#event.widget.itemconfigure (tk.CURRENT, fill =self.defaultcolor)
 
-	def put_new_tiles(self, letter_holder):
+	def associate_letter_tiles(self, letter_holder):
 		for i in range(7):
 			associated_canvas =  self.canvas.find_withtag('letter')[i]
 			self.canvas.itemconfig(associated_canvas, text = letter_holder[i])
 
 	#put tiles on the game board
 	def put_tiles(self, word, x, y, horiz_or_verti):
-		x = 0
-		y = 0
 		for i in range(len(list(word))):
-			if (horiz_or_verti == 0): 	
+			if (horiz_or_verti == 1): 	
 				self.Gameboard_letter[x+i][y] = list(word)[i]
 				self.Gameboard[x+i][y] = 10
 			else:
@@ -252,6 +258,17 @@ class Gameboard():
 			horiz_or_vert = 2
 		return horiz_or_vert
 
+	def get_initialpos(self, horiz_or_vert):
+		minimal_pos = [15,15]
+		for i in range(7):
+			associated_canvas =  self.canvas.find_withtag('letter')[i]
+			if (horiz_or_vert == 0):
+				if (int(self.canvas.coords(associated_canvas)[0]/60) < minimal_pos[0]) and (int(self.canvas.coords(associated_canvas)[0]/60) < 15) and (int(self.canvas.coords(associated_canvas)[1]/60) < 15) :
+					minimal_pos = [int(self.canvas.coords(associated_canvas)[0]/60),int(self.canvas.coords(associated_canvas)[1]/60)]
+			else:
+				if (int(self.canvas.coords(associated_canvas)[1]/60) < minimal_pos[1]) and (int(self.canvas.coords(associated_canvas)[1]/60) < 15) and (int(self.canvas.coords(associated_canvas)[0]/60) < 15) :
+					minimal_pos = [int(self.canvas.coords(associated_canvas)[0]/60),int(self.canvas.coords(associated_canvas)[1]/60)]
+		return minimal_pos
 
 
 
