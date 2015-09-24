@@ -61,31 +61,33 @@ class Scrabble_GUI(Frame):
 
     def fetch_and_run(self,variables):
 	print "Form your words !"
-    	for variable in variables:
-       		self.word = variable.get()
+	horiz_or_verti = self.GM.check_aligned()
+	if horiz_or_verti == 2:
+		print "Not aligned!!!"
+		return 0
+	self.word = self.GM.getword(horiz_or_verti)
 	if (self.serv.usable_letters(self.word, self.serv.letter_holderPL1)==False):
 		print self.word + " can't be made with available letters!!!"
-    		for variable in variables:
-       			self.word = variable.get()
+    		return 0
 	elif (self.serv.check_dict(self.word)==False):
 		print self.word + " doesn't exist, try another word!"
-    		for variable in variables:
-       			self.word = variable.get()
+    		return 0
 	else :
-		#if (self.GM.check_if_possible(self.word, 2, 2, 0) == False):
-		#	print "Action not possible"
-		#else:
-			print self. word +  " was found in the dictionnary, well done!"
-			self.GM.drawGameboard(self.canvas)
-			self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
-			print "Your score : "
-			print self.serv.scorePL1
-			self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
-			self.serv.pick_tiles(self.serv.letter_holderPL1)
-			print self.GM.put_new_tiles(self.serv.letter_holderPL1)
-			self.GM.put_tiles(self.word) #Get first position, get info about horizontal/vertical
-			print "Available letters : " 
-			print self.serv.letter_holderPL1
+		print self. word +  " was found in the dictionnary, well done!"
+		self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)
+		print "Your score : "
+		print self.serv.scorePL1
+		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)
+		self.serv.pick_tiles(self.serv.letter_holderPL1)
+		print self.GM.put_new_tiles(self.serv.letter_holderPL1)
+		self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1)
+		x = 0
+		y = 0
+		self.GM.put_tiles(self.word, x, y, horiz_or_verti) 
+		print "Available letters : " 
+		print self.serv.letter_holderPL1
+		
+		self.GM.drawGameboard(self.canvas)
 
     def run(self):
    	# create the root and the canvas
@@ -96,6 +98,7 @@ class Scrabble_GUI(Frame):
     	self.canvas.tag_bind ("DnD", "<ButtonRelease-1>", self.GM.chkup)
     	self.canvas.tag_bind ("DnD", "<Enter>", self.GM.enter)
     	self.canvas.tag_bind ("DnD", "<Leave>", self.GM.leave)
+	self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1)
 	self.GM.put_new_tiles(self.serv.letter_holderPL1)
 	self.root.mainloop()
 
@@ -178,6 +181,9 @@ class Serveur:
 
 	#Check if word can be made with the letters available in the holder!
 	def usable_letters(self, given_word, letter_holder):
+		print "In usable_letter"
+		print given_word
+		print letter_holder
 		initial_len = len(letter_holder)
 		for i in range(len(list(given_word))):
 			for j in range(len(letter_holder)):

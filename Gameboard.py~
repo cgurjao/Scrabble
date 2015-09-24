@@ -78,6 +78,8 @@ class Gameboard():
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""],
 			["","","","","","","","","","","","","","",""]]
+
+	def draw_letterHolder(self,canvas,root, letter_holder):
 		canvas.create_rectangle(950,0,1010,60, fill='grey', tags=('DnD', '0'))
 		canvas.create_rectangle(950,60,1010,120, fill='grey', tags=('DnD', '1'))
 		canvas.create_rectangle(950,120,1010,180, fill='grey', tags=('DnD', '2'))
@@ -85,13 +87,13 @@ class Gameboard():
 		canvas.create_rectangle(950,240,1010,300, fill='grey', tags=('DnD', '4'))
 		canvas.create_rectangle(950,300,1010,360, fill='grey', tags=('DnD', '5'))
 		canvas.create_rectangle(950,360,1010,420, fill='grey', tags=('DnD', '6'))
-		canvas.create_text (980, 30, text = '', tags=('0', 'letter'))
-		canvas.create_text (980, 90, text = '', tags=('1', 'letter'))
-		canvas.create_text (980, 150, text = '', tags=('2', 'letter'))
-		canvas.create_text (980, 210, text = '', tags=( '3', 'letter'))
-		canvas.create_text (980, 270, text = '', tags=( '4', 'letter'))
-		canvas.create_text (980, 330, text = '', tags=( '5', 'letter'))
-		canvas.create_text (980, 390, text = '', tags=( '6', 'letter'))
+		canvas.create_text (980, 30, text = letter_holder, tags=('0', 'letter'))
+		canvas.create_text (980, 90, text = letter_holder, tags=('1', 'letter'))
+		canvas.create_text (980, 150, text = letter_holder, tags=('2', 'letter'))
+		canvas.create_text (980, 210, text = letter_holder, tags=( '3', 'letter'))
+		canvas.create_text (980, 270, text = letter_holder, tags=( '4', 'letter'))
+		canvas.create_text (980, 330, text = letter_holder, tags=( '5', 'letter'))
+		canvas.create_text (980, 390, text = letter_holder, tags=( '6', 'letter'))
 
 	def loadGameboard(self,canvas):
    		rows = canvas.data["rows"]
@@ -195,14 +197,11 @@ class Gameboard():
 		for i in range(7):
 			associated_canvas =  self.canvas.find_withtag('letter')[i]
 			self.canvas.itemconfig(associated_canvas, text = letter_holder[i])
-		
-
 
 	#put tiles on the game board
-	def put_tiles(self, word, pos): 
+	def put_tiles(self, word, x, y, horiz_or_verti):
 		x = 0
 		y = 0
-		horiz_or_verti = 0
 		for i in range(len(list(word))):
 			if (horiz_or_verti == 0): 	
 				self.Gameboard_letter[x+i][y] = list(word)[i]
@@ -210,5 +209,52 @@ class Gameboard():
 			else:
 				self.Gameboard_letter[x][y+i] = list(word)[i]
 				self.Gameboard[x][y+i] = 10
+
+	def getword(self, horiz_or_verti):
+		associated_canvas =  self.canvas.find_withtag('letter')[0]
+		min = self.canvas.itemcget(associated_canvas, 'text')[0]
+		items = []
+		word = ""
+		if (horiz_or_verti == 1):
+			for i in range(7):
+				associated_canvas =  self.canvas.find_withtag('letter')[i]
+				if ((self.canvas.coords(associated_canvas)[1] < 901) and (self.canvas.coords(associated_canvas)[0] < 901)):
+					items.append(tuple([self.canvas.coords(associated_canvas)[1], self.canvas.itemcget(associated_canvas, 'text')[0]]))
+		else:
+ 			for i in range(7):
+				associated_canvas =  self.canvas.find_withtag('letter')[i]
+				if ((self.canvas.coords(associated_canvas)[1] < 901) and (self.canvas.coords(associated_canvas)[0] < 901)):
+					items.append(tuple([self.canvas.coords(associated_canvas)[0], self.canvas.itemcget(associated_canvas, 'text')[0]]))
+		items = sorted(items)
+		for i in range(len(items)):
+			word = word + items[i][1]
+		return word
+
+	def check_aligned(self):
+		x = []
+		y = []
+		horiz_or_vert = 2
+		for i in range(7):
+			associated_canvas =  self.canvas.find_withtag('letter')[i]
+			if ((self.canvas.coords(associated_canvas)[1] < 901) and (self.canvas.coords(associated_canvas)[0] < 901)):
+				x.append(self.canvas.coords(associated_canvas)[0])
+				y.append(self.canvas.coords(associated_canvas)[1])
+		x = sorted(x)
+		y = sorted(y)
+		for i in range(len(x)-1):
+			sum_x = x[i+1]-x[i] - 60
+			sum_y = y[i+1]-y[i] - 60 
+		if (sum_x == 0):
+			horiz_or_vert = 0
+		if (sum_y == 0):
+			horiz_or_vert = 1
+		if (sum_x == 0 and sum_y == 0):
+			horiz_or_vert = 2
+		return horiz_or_vert
+
+
+
+
+
 
 
