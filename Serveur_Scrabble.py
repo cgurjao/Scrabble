@@ -40,36 +40,29 @@ class Scrabble_GUI(Frame):
         if ans: Frame.quit(self)	
 
     def fetch_and_run(self,variables): #Each time the user clicks on "Fetch", the program will... 
-	print "Form your words !"
 	horiz_or_vert = self.GM.check_aligned()  #...Check if the tiles are aligned and determine if the word is put horizontally or vertically (resp, horiz_or_vert will be equal to 0 and 1)
+	self.word = self.GM.check_over_tiles(horiz_or_vert) #... Check Scrabble's basic rule for playing : new words must use older words' letter
 	if horiz_or_vert == 2:
 		print "Not aligned!!!"
-		return 0
-	self.word = self.GM.getword(horiz_or_vert)	#...get the suggested word from the gameboard 
+		return 0	#...get the suggested word from the gameboard 
 	if (self.serv.check_dict(self.word)==False):   #...Check if the word exists in the dictionnary
 		print self.word + " doesn't exist, try another word!"
     		return 0
 	else :	#If all the previous conditions are met, the algorithm will...
 		print self. word +  " was found in the dictionnary, well done!" 
 		self.serv.scorePL1 = self.serv.get_score(self.word, self.serv.scorePL1)  #...Calculate and update the player's score
+		self.GM.check_other_words()
 		print "Your score : "
 		print self.serv.scorePL1
 		self.serv.remove_used_letters(self.word, self.serv.letter_holderPL1)	#...Remove used letters from the letter holder 
 		initialpos = self.GM.get_initialpos(horiz_or_vert)
 		self.GM.put_tiles(self.word, initialpos[1], initialpos[0], horiz_or_vert) #...Put the suggested word on the gameboard "for real" (i.e. the player won't be able to move them anymore)
 		self.serv.pick_tiles(self.serv.letter_holderPL1) 	#...Fill the letter holder with other tiles
-		self.GM.drawGameboard(self.canvas)
-	self.wait_for_nextclick()
-
-    def wait_for_nextclick(self):
-	self.GM.associate_letter_tiles(self.serv.letter_holderPL1)
-	self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1) #...Print the new updated letter holder on
-	print "Available letters : "  #To display first available letters in the holder
-	print self.serv.letter_holderPL1
-    	Button(self.root, text='Fetch', command=(lambda v=vars: self.fetch_and_run(v))).pack(side=RIGHT) #"Fetch suggested word" button
-    	self.bind('<Return>', (lambda event, v=vars: self.fetch_and_run(v)))
-	
-		
+		self.GM.drawGameboard(self.canvas) 
+		self.GM.associate_letter_tiles(self.serv.letter_holderPL1)
+		self.GM.draw_letterHolder(self.canvas, self.root, self.serv.letter_holderPL1) #...Print the new updated letter holder on
+		print "Available letters : "  #To display first available letters in the holder
+		print self.serv.letter_holderPL1
 
     def run(self):
    	# create the root and the canvas

@@ -248,12 +248,12 @@ class Gameboard():
 		x = sorted(x)
 		y = sorted(y)
 		for i in range(len(x)-1):
-			sum_x = x[i+1]-x[i] - 60
-			sum_y = y[i+1]-y[i] - 60 
+			sum_x = x[i+1]-x[i]
+			sum_y = y[i+1]-y[i]
 		if (sum_x == 0):
-			horiz_or_vert = 0
-		if (sum_y == 0):
 			horiz_or_vert = 1
+		if (sum_y == 0):
+			horiz_or_vert = 0
 		if (sum_x == 0 and sum_y == 0):
 			horiz_or_vert = 2
 		return horiz_or_vert
@@ -270,8 +270,37 @@ class Gameboard():
 					minimal_pos = [int(self.canvas.coords(associated_canvas)[0]/60),int(self.canvas.coords(associated_canvas)[1]/60)]
 		return minimal_pos
 
+	def check_over_tiles(self, horiz_or_vert):
+		items =[]
+		if (horiz_or_vert == 1):
+			for i in range(7):
+				associated_canvas =  self.canvas.find_withtag('letter')[i]
+				if ((self.canvas.coords(associated_canvas)[1] < 901) and (self.canvas.coords(associated_canvas)[0] < 901)):
+					items.append(tuple([self.canvas.coords(associated_canvas)[1],self.canvas.coords(associated_canvas)[0], self.canvas.itemcget(associated_canvas, 'text')[0]]))
+		else:
+ 			for i in range(7):
+				associated_canvas =  self.canvas.find_withtag('letter')[i]
+				if ((self.canvas.coords(associated_canvas)[1] < 901) and (self.canvas.coords(associated_canvas)[0] < 901)):
+					items.append(tuple([self.canvas.coords(associated_canvas)[0],self.canvas.coords(associated_canvas)[1], self.canvas.itemcget(associated_canvas, 'text')[0]]))
+		items = sorted(items)
+		print items
+		last_tile = [int(items[len(items)-1][0]/60), int(items[len(items)-1][1]/60)]
+		first_tile = [int(items[0][0]/60), int(items[0][1]/60)]
 
+		add_letter = []
+		for i in range(last_tile[0]-first_tile[0] - 1):
+			if (int(items[i+1][0]/60) - int(items[i][0]/60)) != 1:
+				if horiz_or_vert == 1:
+					add_letter.append([i+1, self.Gameboard_letter[int(items[i][0]/60) + 1][int(items[i][1]/60)]])
+				else:
+					add_letter.append([i+1, self.Gameboard_letter[int(items[i][1]/60)][int(items[i][0]/60)+1]])
+		for i in range(len(add_letter)):
+			items.insert(int(add_letter[i][0]), tuple([0,0,add_letter[i][1]]))
+		word = ""
+		for i in range(len(items)):
+			word = word + items[i][2]
+		return word
 
-
-
+	def check_other_words():
+		print "A faire"
 
